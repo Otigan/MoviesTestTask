@@ -10,15 +10,17 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.example.moviestesttask.R
 import com.example.moviestesttask.databinding.FragmentMoviesBinding
 import com.example.moviestesttask.presentation.MovieEvent
 import com.example.moviestesttask.presentation.MoviesViewModel
+import com.example.moviestesttask.ui.adapter.GenreAdapter
 import com.example.moviestesttask.ui.adapter.MoviesAdapter
-import com.example.moviestesttask.ui.adapter.MoviesAdapter.Companion.GENRE_VIEW_TYPE
-import com.example.moviestesttask.ui.adapter.MoviesAdapter.Companion.MOVIE_VIEW_TYPE
+import com.example.moviestesttask.ui.adapter.ViewTypes.FILM_VIEW_TYPE
+import com.example.moviestesttask.ui.adapter.ViewTypes.GENRE_VIEW_TYPE
+import com.example.moviestesttask.ui.adapter.ViewTypes.HEADER_VIEW_TYPE
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -47,21 +49,17 @@ class MoviesFragment : Fragment(R.layout.fragment_movies) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        moviesAdapter = MoviesAdapter(
-            onFilmClick = {
-
-            },
-            onGenreClick = {
-
-            }
-        )
+        moviesAdapter = MoviesAdapter()
+        val genreAdapter = GenreAdapter()
+        val concatenated = ConcatAdapter(genreAdapter, moviesAdapter)
 
         val mLayoutManager = GridLayoutManager(context, 2)
-        mLayoutManager.spanSizeLookup = object : SpanSizeLookup() {
+        mLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return when (moviesAdapter.getItemViewType(position)) {
+                return when (concatenated.getItemViewType(position)) {
+                    HEADER_VIEW_TYPE -> 2
                     GENRE_VIEW_TYPE -> 2
-                    MOVIE_VIEW_TYPE -> 1
+                    FILM_VIEW_TYPE -> 2
                     else -> 1
                 }
             }
@@ -70,7 +68,7 @@ class MoviesFragment : Fragment(R.layout.fragment_movies) {
         binding.recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = mLayoutManager
-            adapter = moviesAdapter
+            adapter = concatenated
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -90,14 +88,14 @@ class MoviesFragment : Fragment(R.layout.fragment_movies) {
                         is MovieEvent.Success -> {
                             binding.recyclerView.isVisible = true
                             binding.progressBar.isVisible = false
-                            moviesAdapter.items = event.movies
+                            genreAdapter.genres = event.genres
+                            moviesAdapter.films = event.movies
                         }
                         else -> {}
                     }
                 }
             }
         }
-
     }
 
     override fun onDestroyView() {

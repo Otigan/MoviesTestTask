@@ -1,6 +1,6 @@
 package com.example.moviestesttask.domain.entity
 
-sealed class ListItem {
+sealed class MovieListItem {
 
     data class Film(
         val id: Int,
@@ -11,9 +11,9 @@ sealed class ListItem {
         val image_url: String? = "",
         val description: String? = "",
         val genres: List<String>
-    ) : ListItem()
+    ) : MovieListItem()
 
-    data class Genre(
-        val name: String
-    ) : ListItem()
+    data class Header(
+        val title: String
+    ) : MovieListItem()
 }

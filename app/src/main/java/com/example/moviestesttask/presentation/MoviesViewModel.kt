@@ -1,10 +1,12 @@
 package com.example.moviestesttask.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviestesttask.data.util.Resource
 import com.example.moviestesttask.domain.entity.Film
-import com.example.moviestesttask.domain.entity.ListItem
+import com.example.moviestesttask.domain.entity.GenreListItem
+import com.example.moviestesttask.domain.entity.MovieListItem
 import com.example.moviestesttask.domain.use_case.GetMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +17,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class MovieEvent {
-    data class Success(val movies: List<ListItem>) : MovieEvent()
+    data class Success(val movies: List<MovieListItem>, val genres: List<GenreListItem>) :
+        MovieEvent()
+
     object Loading : MovieEvent()
     data class Error(val errorMessage: String) : MovieEvent()
     object Empty : MovieEvent()
@@ -41,9 +45,25 @@ class MoviesViewModel @Inject constructor(private val getMoviesUseCase: GetMovie
                         _movies.value = MovieEvent.Loading
                     }
                     is Resource.Success -> {
-                        resource.data?.let {
-                            val finalList = mergeLists(it)
-                            _movies.value = MovieEvent.Success(finalList)
+                        resource.data?.let { films ->
+                            val genres = getGenresList(films)
+                            Log.d("ViewModel", ": ${genres[0]}")
+                            val filmItems = films.map {
+                                MovieListItem.Film(
+                                    it.id,
+                                    it.localized_name,
+                                    it.name,
+                                    it.year,
+                                    it.rating,
+                                    it.image_url,
+                                    it.description,
+                                    it.genres
+                                )
+                            }
+                            val listItems =
+                                mutableListOf<MovieListItem>(MovieListItem.Header("Фильмы"))
+                            listItems.addAll(filmItems)
+                            _movies.value = MovieEvent.Success(listItems, genres)
                         }
                     }
                 }
@@ -51,29 +71,17 @@ class MoviesViewModel @Inject constructor(private val getMoviesUseCase: GetMovie
         }
     }
 
-    private fun mergeLists(movies: List<Film>): List<ListItem> {
+    private fun getGenresList(movies: List<Film>): List<GenreListItem> {
         val genres = mutableListOf<String>()
-        val sortedMovies = movies.sortedBy { it.localized_name }
-        val finalList = mutableListOf<ListItem>()
-        for (movie in sortedMovies) {
-            val listItemMovie = ListItem.Film(
-                movie.id,
-                movie.name,
-                movie.localized_name,
-                movie.year,
-                movie.rating,
-                movie.image_url,
-                movie.description,
-                movie.genres
-            )
-            finalList.add(listItemMovie)
+        for (movie in movies) {
             genres.addAll(movie.genres)
         }
         val distinctGenres = genres.distinct().map {
-            ListItem.Genre(it)
+            GenreListItem.Genre(it)
         }
-        finalList.addAll(0, distinctGenres)
-        return finalList.toList()
+        val listItems =
+            mutableListOf<GenreListItem>(GenreListItem.Header("Жанры"))
+        listItems.addAll(distinctGenres)
+        return listItems.toList()
     }
-
 }
