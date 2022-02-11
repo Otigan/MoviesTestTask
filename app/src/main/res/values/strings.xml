@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MoviesTestTask</string>
+
+    <!-- Errors   -->
+    <string name="error_no_internet_connection">No internet connection</string>
+    <string name="error_timeout">Timeout response</string>
+    <string name="error_401">User is unauthorized</string>
+    <string name="error_403">Access is permitted</string>
+    <string name="error_404">Not found, please, check input data</string>
+    <string name="error_unknown">Unknown error</string>
+</resources>
