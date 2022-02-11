@@ -8,4 +8,6 @@ interface MoviesRepository {
 
     fun getMovies(): Flow<Resource<List<Film>>>
 
+    fun getMoviesByGenre(genre: String): Flow<Resource<List<Film>>>
+
 }

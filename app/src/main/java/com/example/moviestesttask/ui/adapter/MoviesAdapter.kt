@@ -17,7 +17,6 @@ class MoviesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             notifyDataSetChanged()
         }
 
-
     override fun getItemViewType(position: Int): Int =
         if (films[position] is MovieListItem.Header) {
             HEADER_VIEW_TYPE

@@ -25,4 +25,21 @@ class MoviesRepositoryImpl @Inject constructor(
             emit(responseHandler.handleException(e, null))
         }
     }
+
+    override fun getMoviesByGenre(genre: String): Flow<Resource<List<Film>>> = flow {
+        try {
+            emit(Resource.Loading())
+            val response = moviesDataSource.getMovies()
+            val movies = if (genre.isEmpty()) {
+                response.films
+            } else {
+                response.films.filter {
+                    it.genres.contains(genre)
+                }
+            }
+            emit(responseHandler.handleSuccess(movies))
+        } catch (e: Exception) {
+            emit(responseHandler.handleException(e, null))
+        }
+    }
 }

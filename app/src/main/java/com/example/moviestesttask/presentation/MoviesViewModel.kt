@@ -7,12 +7,15 @@ import com.example.moviestesttask.data.util.Resource
 import com.example.moviestesttask.domain.entity.Film
 import com.example.moviestesttask.domain.entity.GenreListItem
 import com.example.moviestesttask.domain.entity.MovieListItem
+import com.example.moviestesttask.domain.use_case.FilterMoviesUseCase
 import com.example.moviestesttask.domain.use_case.GetMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,8 +29,17 @@ sealed class MovieEvent {
 }
 
 @HiltViewModel
-class MoviesViewModel @Inject constructor(private val getMoviesUseCase: GetMoviesUseCase) :
+@ExperimentalCoroutinesApi
+class MoviesViewModel @Inject constructor(
+    private val getMoviesUseCase: GetMoviesUseCase,
+    private val filterMoviesUseCase: FilterMoviesUseCase
+) :
     ViewModel() {
+
+    private val _filterQuery = MutableStateFlow("")
+    val filteredMovies = _filterQuery.flatMapLatest {
+        filterMoviesUseCase(it)
+    }
 
     private val _movies = MutableStateFlow<MovieEvent>(MovieEvent.Empty)
     val movies = _movies.asStateFlow()
@@ -68,6 +80,14 @@ class MoviesViewModel @Inject constructor(private val getMoviesUseCase: GetMovie
                     }
                 }
             }
+        }
+    }
+
+    fun filterMovies(query: String) {
+        if (query == _filterQuery.value) {
+            _filterQuery.value = ""
+        } else {
+            _filterQuery.value = query
         }
     }
 

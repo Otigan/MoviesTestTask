@@ -9,7 +9,8 @@ import com.example.moviestesttask.domain.entity.GenreListItem
 import com.example.moviestesttask.ui.adapter.ViewTypes.GENRE_VIEW_TYPE
 import com.example.moviestesttask.ui.adapter.ViewTypes.HEADER_VIEW_TYPE
 
-class GenreAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class GenreAdapter(private val onClick: (genre: GenreListItem.Genre) -> Unit) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var genres: List<GenreListItem> = emptyList()
         set(value) {
@@ -35,7 +36,7 @@ class GenreAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             GENRE_VIEW_TYPE -> {
                 val binding =
                     ItemGenreBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                GenreViewHolder(binding)
+                GenreViewHolder(binding, onClick)
             }
             else -> throw IllegalArgumentException("Unknown view type: $viewType")
         }
