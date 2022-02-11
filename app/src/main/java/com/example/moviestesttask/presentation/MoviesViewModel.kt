@@ -8,9 +8,9 @@ import com.example.moviestesttask.domain.entity.ListItem
 import com.example.moviestesttask.domain.use_case.GetMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,14 +18,15 @@ sealed class MovieEvent {
     data class Success(val movies: List<ListItem>) : MovieEvent()
     object Loading : MovieEvent()
     data class Error(val errorMessage: String) : MovieEvent()
+    object Empty : MovieEvent()
 }
 
 @HiltViewModel
 class MoviesViewModel @Inject constructor(private val getMoviesUseCase: GetMoviesUseCase) :
     ViewModel() {
 
-    private val moviesEventChannel = Channel<MovieEvent>(Channel.BUFFERED)
-    val moviesEventFlow = moviesEventChannel.receiveAsFlow()
+    private val _movies = MutableStateFlow<MovieEvent>(MovieEvent.Empty)
+    val movies = _movies.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -33,14 +34,16 @@ class MoviesViewModel @Inject constructor(private val getMoviesUseCase: GetMovie
                 when (resource) {
                     is Resource.Error -> {
                         resource.errorMessage?.let {
-                            moviesEventChannel.send(MovieEvent.Error(it))
+                            _movies.value = MovieEvent.Error(it)
                         }
                     }
-                    is Resource.Loading -> moviesEventChannel.send(MovieEvent.Loading)
+                    is Resource.Loading -> {
+                        _movies.value = MovieEvent.Loading
+                    }
                     is Resource.Success -> {
                         resource.data?.let {
                             val finalList = mergeLists(it)
-                            moviesEventChannel.send(MovieEvent.Success(finalList))
+                            _movies.value = MovieEvent.Success(finalList)
                         }
                     }
                 }
@@ -50,8 +53,9 @@ class MoviesViewModel @Inject constructor(private val getMoviesUseCase: GetMovie
 
     private fun mergeLists(movies: List<Film>): List<ListItem> {
         val genres = mutableListOf<String>()
+        val sortedMovies = movies.sortedBy { it.localized_name }
         val finalList = mutableListOf<ListItem>()
-        for (movie in movies) {
+        for (movie in sortedMovies) {
             val listItemMovie = ListItem.Film(
                 movie.id,
                 movie.name,

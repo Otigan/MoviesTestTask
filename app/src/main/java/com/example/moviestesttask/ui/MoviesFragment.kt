@@ -1,11 +1,9 @@
 package com.example.moviestesttask.ui
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,16 +11,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import com.example.moviestesttask.R
 import com.example.moviestesttask.databinding.FragmentMoviesBinding
 import com.example.moviestesttask.presentation.MovieEvent
 import com.example.moviestesttask.presentation.MoviesViewModel
 import com.example.moviestesttask.ui.adapter.MoviesAdapter
+import com.example.moviestesttask.ui.adapter.MoviesAdapter.Companion.GENRE_VIEW_TYPE
+import com.example.moviestesttask.ui.adapter.MoviesAdapter.Companion.MOVIE_VIEW_TYPE
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class MoviesFragment : Fragment(R.layout.fragment_movies) {
@@ -42,36 +43,39 @@ class MoviesFragment : Fragment(R.layout.fragment_movies) {
         return _binding?.root
     }
 
-    private fun setLinearLayoutManager() {
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
-        binding.recyclerView.adapter = moviesAdapter
-    }
 
-    private fun setGridLayoutManager() {
-        binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
-        binding.recyclerView.adapter = moviesAdapter
-    }
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        moviesAdapter = MoviesAdapter(setLinearLayoutManager = {
-            setLinearLayoutManager()
-        }, setGridLayoutManager = {
-            setGridLayoutManager()
-        })
+        moviesAdapter = MoviesAdapter(
+            onFilmClick = {
+
+            },
+            onGenreClick = {
+
+            }
+        )
+
+        val mLayoutManager = GridLayoutManager(context, 2)
+        mLayoutManager.spanSizeLookup = object : SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (moviesAdapter.getItemViewType(position)) {
+                    GENRE_VIEW_TYPE -> 2
+                    MOVIE_VIEW_TYPE -> 1
+                    else -> 1
+                }
+            }
+        }
 
         binding.recyclerView.apply {
             setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = mLayoutManager
             adapter = moviesAdapter
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                moviesViewModel.moviesEventFlow.collectLatest { event ->
+                moviesViewModel.movies.collectLatest { event ->
                     when (event) {
                         is MovieEvent.Error -> {
                             binding.recyclerView.isVisible = false
@@ -88,6 +92,7 @@ class MoviesFragment : Fragment(R.layout.fragment_movies) {
                             binding.progressBar.isVisible = false
                             moviesAdapter.items = event.movies
                         }
+                        else -> {}
                     }
                 }
             }
