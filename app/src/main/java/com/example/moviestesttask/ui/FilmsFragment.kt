@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.moviestesttask.R
 import com.example.moviestesttask.databinding.FragmentFilmsBinding
 import com.example.moviestesttask.domain.entity.FilmListItem
-import com.example.moviestesttask.presentation.MoviesViewModel
+import com.example.moviestesttask.presentation.FilmsViewModel
 import com.example.moviestesttask.presentation.util.FilmEvent
 import com.example.moviestesttask.presentation.util.GenreEvent
 import com.example.moviestesttask.ui.adapter.FilmAdapter
@@ -38,7 +38,7 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
 
     private var _binding: FragmentFilmsBinding? = null
     private val binding get() = _binding!!
-    private val moviesViewModel by viewModels<MoviesViewModel>()
+    private val filmsViewModel by viewModels<FilmsViewModel>()
     private lateinit var filmAdapter: FilmAdapter
     private lateinit var genreAdapter: GenreAdapter
 
@@ -51,7 +51,7 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
         })
         genreAdapter = GenreAdapter(
             onClick = { genre ->
-                moviesViewModel.filterMovies(genre.title)
+                filmsViewModel.filterMovies(genre.title)
             }
         )
         selectedPosition?.let {
@@ -79,7 +79,7 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
         val concatAdapterConfig = ConcatAdapter.Config.Builder()
             .setIsolateViewTypes(false)
             .build()
-        val concatenated = ConcatAdapter(concatAdapterConfig,genreAdapter, filmAdapter)
+        val concatenated = ConcatAdapter(concatAdapterConfig, genreAdapter, filmAdapter)
 
         val mLayoutManager = getFooterAdjustedGridLayoutManager(concatenated, requireContext())
 
@@ -92,7 +92,7 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    moviesViewModel.films.collectLatest { event ->
+                    filmsViewModel.films.collectLatest { event ->
                         when (event) {
                             is FilmEvent.Error -> {
                                 binding.recyclerView.isVisible = false
@@ -117,7 +117,7 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
                     }
                 }
                 launch {
-                    moviesViewModel.genres.collectLatest { event ->
+                    filmsViewModel.genres.collectLatest { event ->
                         when (event) {
                             is GenreEvent.Error -> {
                                 binding.recyclerView.isVisible = false

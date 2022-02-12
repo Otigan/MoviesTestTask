@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/moviesFragment"
         android:name="com.example.moviestesttask.ui.FilmsFragment"
-        android:label="fragment_movies"
+        android:label="@string/nav_films_tile"
         tools:layout="@layout/fragment_films">
         <action
             android:id="@+id/action_moviesFragment_to_filmDetailedFragment"

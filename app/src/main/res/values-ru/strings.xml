@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_timeout">Время ожидания ответа истекло</string>
+    <string name="error_401">Пользователь не авторизован</string>
+    <string name="error_403">Доступ запрещен</string>
+    <string name="error_404">Не найдено</string>
+    <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="film_year">Год: %d</string>
+    <string name="film_rating">Рейтинг: %.2f</string>
+    <string name="film_rating_not_found">Рейтинг: %s</string>
+    <string name="genre_header">Жанры</string>
+    <string name="film_header">Фильмы</string>
+    <string name="nav_films_tile">Фильмы</string>
+</resources>

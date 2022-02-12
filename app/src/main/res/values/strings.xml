@@ -1,15 +1,20 @@
 <resources>
-    <string name="app_name">MoviesTestTask</string>
+    <string name="app_name" translatable="false">MoviesTestTask</string>
 
     <!-- Errors   -->
-    <string name="error_no_internet_connection">No internet connection</string>
     <string name="error_timeout">Timeout response</string>
     <string name="error_401">User is unauthorized</string>
     <string name="error_403">Access is permitted</string>
-    <string name="error_404">Not found, please, check input data</string>
+    <string name="error_404">Not found</string>
     <string name="error_unknown">Unknown error</string>
 
-    <string name="film_year">Год: %d</string>
-    <string name="film_rating">Рейтинг: %.2f</string>
-    <string name="film_rating_not_found">Рейтинг: %s</string>
+    <!--  Headers  -->
+    <string name="genre_header">Genres</string>
+    <string name="film_header">Films</string>
+
+    <string name="nav_films_tile">Films</string>
+
+    <string name="film_year">Year: %d</string>
+    <string name="film_rating">Rating: %.2f</string>
+    <string name="film_rating_not_found">Rating: %s</string>
 </resources>

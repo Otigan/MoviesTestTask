@@ -1,12 +1,7 @@
 package com.example.moviestesttask.ui.adapter
 
-import android.content.Context
-import android.graphics.Color
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviestesttask.R
 import com.example.moviestesttask.databinding.ItemGenreBinding
@@ -73,17 +68,15 @@ class GenreAdapter(
                 if (selectedPosition == holder.bindingAdapterPosition) {
                     val selected_color =
                         MaterialColors.getColor(
-                            holder.itemView.context,
-                            R.attr.selectedGenreColor,
-                            Color.BLACK
+                            holder.itemView,
+                            R.attr.selectedGenreColor
                         )
                     holder.itemView.setBackgroundColor(selected_color)
                 } else {
                     val unselected_color =
                         MaterialColors.getColor(
-                            holder.itemView.context,
-                            R.attr.unselectedGenreColor,
-                            Color.BLACK
+                            holder.itemView,
+                            R.attr.unselectedGenreColor
                         )
                     holder.itemView.setBackgroundColor(unselected_color)
                 }
@@ -103,14 +96,4 @@ class GenreAdapter(
     }
 
     override fun getItemCount(): Int = genres.size
-}
-
-@ColorInt
-fun Context.getColorFromAttr(
-    @AttrRes attrColor: Int,
-    typedValue: TypedValue = TypedValue(),
-    resolveRefs: Boolean = true
-): Int {
-    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
-    return typedValue.data
 }

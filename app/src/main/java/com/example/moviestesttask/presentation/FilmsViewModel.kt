@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 @ExperimentalCoroutinesApi
-class MoviesViewModel @Inject constructor(
+class FilmsViewModel @Inject constructor(
     private val getMoviesUseCase: GetMoviesUseCase,
     private val filterMoviesUseCase: FilterMoviesUseCase,
     private val getGenresUseCase: GetGenresUseCase

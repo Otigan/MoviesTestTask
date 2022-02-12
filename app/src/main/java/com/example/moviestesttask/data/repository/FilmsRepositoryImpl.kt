@@ -1,6 +1,6 @@
 package com.example.moviestesttask.data.repository
 
-import com.example.moviestesttask.data.datasource.FilmsDataSource
+import com.example.moviestesttask.data.datasource.FilmsDataSourceImpl
 import com.example.moviestesttask.data.mapper.FilmMapper
 import com.example.moviestesttask.data.util.Resource
 import com.example.moviestesttask.data.util.ResponseHandler
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class FilmsRepositoryImpl @Inject constructor(
-    private val filmsDataSource: FilmsDataSource,
+    private val filmsDataSourceImpl: FilmsDataSourceImpl,
     private val responseHandler: ResponseHandler
 ) :
     FilmsRepository {
@@ -20,7 +20,7 @@ class FilmsRepositoryImpl @Inject constructor(
     override fun getGenres(): Flow<Resource<List<GenreListItem>>> = flow {
         try {
             emit(Resource.Loading())
-            val response = filmsDataSource.getMovies()
+            val response = filmsDataSourceImpl.getMovies()
             val films = response.films.sortedBy { it.localized_name }
             val genres = mutableListOf<String>()
             for (film in films) {
@@ -41,7 +41,7 @@ class FilmsRepositoryImpl @Inject constructor(
     override fun getMovies(genre: String?): Flow<Resource<List<FilmListItem>>> = flow {
         try {
             emit(Resource.Loading())
-            val response = filmsDataSource.getMovies()
+            val response = filmsDataSourceImpl.getMovies()
             val films = when {
                 genre?.isBlank() == true -> {
                     response.films.sortedBy { it.localized_name }

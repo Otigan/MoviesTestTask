@@ -43,7 +43,8 @@ class FilmDetailedFragment : Fragment(R.layout.fragment_film_detailed) {
             film.rating?.let {
                 txtRating.text = getString(R.string.film_rating, it)
             } ?: run {
-                txtRating.text = getString(R.string.film_rating_not_found, "не найдено")
+                txtRating.text =
+                    getString(R.string.film_rating_not_found, R.string.film_rating_not_found)
             }
             txtDescription.text = film.description
         }
