@@ -1,14 +1,15 @@
 package com.example.moviestesttask.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.moviestesttask.data.model.Film
 import com.example.moviestesttask.data.util.Resource
-import com.example.moviestesttask.domain.entity.Film
 import com.example.moviestesttask.domain.entity.GenreListItem
-import com.example.moviestesttask.domain.entity.MovieListItem
 import com.example.moviestesttask.domain.use_case.FilterMoviesUseCase
+import com.example.moviestesttask.domain.use_case.GetGenresUseCase
 import com.example.moviestesttask.domain.use_case.GetMoviesUseCase
+import com.example.moviestesttask.presentation.util.FilmEvent
+import com.example.moviestesttask.presentation.util.GenreEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,20 +20,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class MovieEvent {
-    data class Success(val movies: List<MovieListItem>, val genres: List<GenreListItem>) :
-        MovieEvent()
-
-    object Loading : MovieEvent()
-    data class Error(val errorMessage: String) : MovieEvent()
-    object Empty : MovieEvent()
-}
-
 @HiltViewModel
 @ExperimentalCoroutinesApi
 class MoviesViewModel @Inject constructor(
     private val getMoviesUseCase: GetMoviesUseCase,
-    private val filterMoviesUseCase: FilterMoviesUseCase
+    private val filterMoviesUseCase: FilterMoviesUseCase,
+    private val getGenresUseCase: GetGenresUseCase
 ) :
     ViewModel() {
 
@@ -41,47 +34,55 @@ class MoviesViewModel @Inject constructor(
         filterMoviesUseCase(it)
     }
 
-    private val _movies = MutableStateFlow<MovieEvent>(MovieEvent.Empty)
-    val movies = _movies.asStateFlow()
+    private val _films = MutableStateFlow<FilmEvent>(FilmEvent.Empty)
+    val films = _films.asStateFlow()
+
+    private val _genres = MutableStateFlow<GenreEvent>(GenreEvent.Empty)
+    val genres = _genres.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            getMoviesUseCase().collectLatest { resource ->
-                when (resource) {
-                    is Resource.Error -> {
-                        resource.errorMessage?.let {
-                            _movies.value = MovieEvent.Error(it)
+            launch {
+                getMoviesUseCase().collectLatest { resource ->
+                    when (resource) {
+                        is Resource.Error -> {
+                            resource.errorMessage?.let {
+                                _films.value = FilmEvent.Error(it)
+                            }
+                        }
+                        is Resource.Loading -> {
+                            _films.value = FilmEvent.Loading
+                        }
+                        is Resource.Success -> {
+                            resource.data?.let { films ->
+                                _films.value = FilmEvent.Success(films)
+                            }
                         }
                     }
-                    is Resource.Loading -> {
-                        _movies.value = MovieEvent.Loading
-                    }
-                    is Resource.Success -> {
-                        resource.data?.let { films ->
-                            val genres = getGenresList(films)
-                            Log.d("ViewModel", ": ${genres[0]}")
-                            val filmItems = films.map {
-                                MovieListItem.Film(
-                                    it.id,
-                                    it.localized_name,
-                                    it.name,
-                                    it.year,
-                                    it.rating,
-                                    it.image_url,
-                                    it.description,
-                                    it.genres
-                                )
+                }
+            }
+            launch {
+                getGenresUseCase().collectLatest { resource ->
+                    when (resource) {
+                        is Resource.Error -> {
+                            resource.errorMessage?.let {
+                                _genres.value = GenreEvent.Error(it)
                             }
-                            val listItems =
-                                mutableListOf<MovieListItem>(MovieListItem.Header("Фильмы"))
-                            listItems.addAll(filmItems)
-                            _movies.value = MovieEvent.Success(listItems, genres)
+                        }
+                        is Resource.Loading -> {
+                            _genres.value = GenreEvent.Loading
+                        }
+                        is Resource.Success -> {
+                            resource.data?.let { genres ->
+                                _genres.value = GenreEvent.Success(genres)
+                            }
                         }
                     }
                 }
             }
         }
     }
+
 
     fun filterMovies(query: String) {
         if (query == _filterQuery.value) {

@@ -8,4 +8,8 @@
     <string name="error_403">Access is permitted</string>
     <string name="error_404">Not found, please, check input data</string>
     <string name="error_unknown">Unknown error</string>
+
+    <string name="film_year">Год: %d</string>
+    <string name="film_rating">Рейтинг: %.2f</string>
+    <string name="film_rating_not_found">Рейтинг: %s</string>
 </resources>

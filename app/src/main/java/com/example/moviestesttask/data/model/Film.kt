@@ -1,4 +1,4 @@
-package com.example.moviestesttask.domain.entity
+package com.example.moviestesttask.data.model
 
 data class Film(
     val id: Int,

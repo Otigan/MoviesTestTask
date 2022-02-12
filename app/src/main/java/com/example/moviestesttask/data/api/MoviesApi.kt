@@ -1,6 +1,6 @@
 package com.example.moviestesttask.data.api
 
-import com.example.moviestesttask.domain.entity.Response
+import com.example.moviestesttask.data.repository.Response
 import retrofit2.http.GET
 
 interface MoviesApi {

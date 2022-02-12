@@ -6,27 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".ui.FilmDetailedFragment">
 
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="16dp" />
+        app:layout_constraintGuide_begin="@dimen/guideline_size" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_start"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="16dp" />
+        app:layout_constraintGuide_begin="@dimen/guideline_size" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_end"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="16dp" />
+        app:layout_constraintGuide_end="@dimen/guideline_size" />
 
 
     <androidx.constraintlayout.widget.Barrier
@@ -35,6 +34,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:barrierDirection="end"
+        app:barrierMargin="20dp"
         app:constraint_referenced_ids="film_image" />
 
     <androidx.constraintlayout.widget.Barrier
@@ -43,12 +43,15 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:barrierDirection="bottom"
+        app:barrierMargin="16dp"
         app:constraint_referenced_ids="film_image" />
 
     <ImageView
         android:id="@+id/film_image"
-        android:layout_width="100dp"
-        android:layout_height="150dp"
+        android:layout_width="@dimen/film_detailed_image_width"
+        android:layout_height="@dimen/film_detailed_image_height"
+        app:layout_constraintBottom_toBottomOf="@id/barrier_bottom"
+        app:layout_constraintEnd_toEndOf="@id/barrier"
         app:layout_constraintStart_toStartOf="@id/guideline_start"
         app:layout_constraintTop_toTopOf="@id/guideline_top" />
 
@@ -56,16 +59,19 @@
         android:id="@+id/txt_localized_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="?textViewColor"
+        android:textSize="@dimen/textViewSize"
         app:layout_constraintBottom_toTopOf="@id/txt_original_name"
         app:layout_constraintStart_toStartOf="@id/barrier"
         app:layout_constraintTop_toTopOf="@id/guideline_top"
         tools:text="Название фильма" />
 
-
     <TextView
         android:id="@+id/txt_original_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="?textViewColor"
+        android:textSize="@dimen/textViewSize"
         app:layout_constraintBottom_toTopOf="@id/txt_year"
         app:layout_constraintStart_toStartOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/txt_localized_name"
@@ -75,6 +81,8 @@
         android:id="@+id/txt_year"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="?textViewColor"
+        android:textSize="@dimen/textViewSize"
         app:layout_constraintBottom_toTopOf="@id/txt_rating"
         app:layout_constraintStart_toStartOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/txt_original_name"
@@ -82,8 +90,10 @@
 
     <TextView
         android:id="@+id/txt_rating"
-        android:layout_width="20dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="?textViewColor"
+        android:textSize="@dimen/textViewSize"
         app:layout_constraintBottom_toBottomOf="@id/barrier_bottom"
         app:layout_constraintStart_toStartOf="@id/barrier"
         app:layout_constraintTop_toBottomOf="@id/txt_year"
@@ -91,8 +101,12 @@
 
     <TextView
         android:id="@+id/txt_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:textColor="?textViewColor"
+        android:textSize="@dimen/textViewSize"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_end"
         app:layout_constraintStart_toStartOf="@id/guideline_start"
         app:layout_constraintTop_toBottomOf="@id/barrier_bottom"
         tools:text="Sample description" />

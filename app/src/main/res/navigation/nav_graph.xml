@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/moviesFragment"
-        android:name="com.example.moviestesttask.ui.MoviesFragment"
+        android:name="com.example.moviestesttask.ui.FilmsFragment"
         android:label="fragment_movies"
-        tools:layout="@layout/fragment_movies" >
+        tools:layout="@layout/fragment_films">
         <action
             android:id="@+id/action_moviesFragment_to_filmDetailedFragment"
             app:destination="@id/filmDetailedFragment" />
@@ -17,10 +17,13 @@
     <fragment
         android:id="@+id/filmDetailedFragment"
         android:name="com.example.moviestesttask.ui.FilmDetailedFragment"
-        android:label="fragment_film_detailed"
-        tools:layout="@layout/fragment_film_detailed" >
+        android:label="{title}"
+        tools:layout="@layout/fragment_film_detailed">
         <argument
             android:name="film"
-            app:argType="com.example.moviestesttask.domain.entity.MovieListItem$Film" />
+            app:argType="com.example.moviestesttask.domain.entity.FilmListItem$Film" />
+        <argument
+            android:name="title"
+            app:argType="string" />
     </fragment>
 </navigation>

@@ -3,7 +3,7 @@ package com.example.moviestesttask.domain.entity
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-sealed class MovieListItem {
+sealed class FilmListItem {
 
     @Parcelize
     data class Film(
@@ -15,9 +15,9 @@ sealed class MovieListItem {
         val image_url: String? = "",
         val description: String? = "",
         val genres: List<String>
-    ) : MovieListItem(), Parcelable
+    ) : FilmListItem(), Parcelable
 
     data class Header(
         val title: String
-    ) : MovieListItem()
+    ) : FilmListItem()
 }

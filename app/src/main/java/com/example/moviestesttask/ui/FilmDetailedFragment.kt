@@ -34,12 +34,17 @@ class FilmDetailedFragment : Fragment(R.layout.fragment_film_detailed) {
             context?.let {
                 Glide.with(it)
                     .load(film.image_url)
+                    .error(R.drawable.not_found)
                     .into(filmImage)
             }
             txtLocalizedName.text = film.localized_name
             txtOriginalName.text = film.name
-            txtYear.text = film.year.toString()
-            txtRating.text = film.rating.toString()
+            txtYear.text = getString(R.string.film_year, film.year)
+            film.rating?.let {
+                txtRating.text = getString(R.string.film_rating, it)
+            } ?: run {
+                txtRating.text = getString(R.string.film_rating_not_found, "не найдено")
+            }
             txtDescription.text = film.description
         }
     }

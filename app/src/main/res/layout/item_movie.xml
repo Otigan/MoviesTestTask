@@ -9,13 +9,13 @@
 
     <ImageView
         android:id="@+id/card_image"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="@dimen/item_film_image_size"
+        android:layout_height="@dimen/item_film_image_size"
         android:scaleType="centerCrop" />
 
     <View
-        android:layout_width="150dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/gradient_width"
+        android:layout_height="@dimen/gradient_height"
         android:layout_gravity="bottom"
         android:background="@drawable/shape_gradient" />
 
@@ -23,11 +23,12 @@
         android:id="@+id/movie_title"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
+        android:layout_gravity="bottom"
         android:ellipsize="end"
+        android:gravity="center"
         android:maxLines="2"
-        android:textColor="@color/white"
-        android:textSize="20sp"
+        android:textColor="?textViewFilmCardColor"
+        android:textSize="@dimen/textViewSize"
         tools:text="Article" />
 
 

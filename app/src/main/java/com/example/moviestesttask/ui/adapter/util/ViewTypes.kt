@@ -1,4 +1,4 @@
-package com.example.moviestesttask.ui.adapter
+package com.example.moviestesttask.ui.adapter.util
 
 object ViewTypes {
     const val GENRE_HEADER_VIEW_TYPE = 0
