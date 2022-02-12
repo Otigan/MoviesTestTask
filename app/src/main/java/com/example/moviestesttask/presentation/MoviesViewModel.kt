@@ -2,9 +2,7 @@ package com.example.moviestesttask.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.moviestesttask.data.model.Film
 import com.example.moviestesttask.data.util.Resource
-import com.example.moviestesttask.domain.entity.GenreListItem
 import com.example.moviestesttask.domain.use_case.FilterMoviesUseCase
 import com.example.moviestesttask.domain.use_case.GetGenresUseCase
 import com.example.moviestesttask.domain.use_case.GetMoviesUseCase
@@ -16,7 +14,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,13 +23,9 @@ class MoviesViewModel @Inject constructor(
     private val getMoviesUseCase: GetMoviesUseCase,
     private val filterMoviesUseCase: FilterMoviesUseCase,
     private val getGenresUseCase: GetGenresUseCase
-) :
-    ViewModel() {
+) : ViewModel() {
 
-    private val _filterQuery = MutableStateFlow("")
-    val filteredMovies = _filterQuery.flatMapLatest {
-        filterMoviesUseCase(it)
-    }
+    private var currentQuery: String = ""
 
     private val _films = MutableStateFlow<FilmEvent>(FilmEvent.Empty)
     val films = _films.asStateFlow()
@@ -83,26 +76,30 @@ class MoviesViewModel @Inject constructor(
         }
     }
 
-
     fun filterMovies(query: String) {
-        if (query == _filterQuery.value) {
-            _filterQuery.value = ""
-        } else {
-            _filterQuery.value = query
+        viewModelScope.launch {
+            currentQuery = if (currentQuery == query) {
+                ""
+            } else {
+                query
+            }
+            filterMoviesUseCase(currentQuery).collectLatest { resource ->
+                when (resource) {
+                    is Resource.Error -> {
+                        resource.errorMessage?.let {
+                            _films.value = FilmEvent.Error(it)
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _films.value = FilmEvent.Loading
+                    }
+                    is Resource.Success -> {
+                        resource.data?.let { genres ->
+                            _films.value = FilmEvent.Success(genres)
+                        }
+                    }
+                }
+            }
         }
-    }
-
-    private fun getGenresList(movies: List<Film>): List<GenreListItem> {
-        val genres = mutableListOf<String>()
-        for (movie in movies) {
-            genres.addAll(movie.genres)
-        }
-        val distinctGenres = genres.distinct().map {
-            GenreListItem.Genre(it)
-        }
-        val listItems =
-            mutableListOf<GenreListItem>(GenreListItem.Header("Жанры"))
-        listItems.addAll(distinctGenres)
-        return listItems.toList()
     }
 }

@@ -1,15 +1,22 @@
 package com.example.moviestesttask.ui.adapter
 
+import android.content.Context
 import android.graphics.Color
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.RecyclerView
+import com.example.moviestesttask.R
 import com.example.moviestesttask.databinding.ItemGenreBinding
 import com.example.moviestesttask.databinding.ItemHeaderBinding
 import com.example.moviestesttask.domain.entity.GenreListItem
 import com.example.moviestesttask.ui.adapter.util.ViewTypes.GENRE_HEADER_VIEW_TYPE
 import com.example.moviestesttask.ui.adapter.util.ViewTypes.GENRE_VIEW_TYPE
 import com.example.moviestesttask.ui.adapter.viewholder.GenreHeaderViewHolder
+import com.google.android.material.color.MaterialColors
+
 
 class GenreAdapter(
     private val onClick: (genre: GenreListItem.Genre) -> Unit
@@ -64,9 +71,21 @@ class GenreAdapter(
             is GenreViewHolder -> {
                 holder.bind(genres[position] as GenreListItem.Genre)
                 if (selectedPosition == holder.bindingAdapterPosition) {
-                    holder.itemView.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                    val selected_color =
+                        MaterialColors.getColor(
+                            holder.itemView.context,
+                            R.attr.selectedGenreColor,
+                            Color.BLACK
+                        )
+                    holder.itemView.setBackgroundColor(selected_color)
                 } else {
-                    holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
+                    val unselected_color =
+                        MaterialColors.getColor(
+                            holder.itemView.context,
+                            R.attr.unselectedGenreColor,
+                            Color.BLACK
+                        )
+                    holder.itemView.setBackgroundColor(unselected_color)
                 }
                 holder.itemView.setOnClickListener {
                     if (selectedPosition == holder.bindingAdapterPosition) {
@@ -84,4 +103,14 @@ class GenreAdapter(
     }
 
     override fun getItemCount(): Int = genres.size
+}
+
+@ColorInt
+fun Context.getColorFromAttr(
+    @AttrRes attrColor: Int,
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+    return typedValue.data
 }

@@ -2,4 +2,6 @@
 <resources>
     <attr name="textViewColor" format="reference|color" />
     <attr name="textViewFilmCardColor" format="reference|color" />
+    <attr name="selectedGenreColor" format="reference|color" />
+    <attr name="unselectedGenreColor" format="reference|color" />
 </resources>

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     app:cardCornerRadius="16dp">
 
     <TextView
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textColor="?textViewColor"
-        android:textSize="@dimen/textViewSize"
+        android:textSize="@dimen/genreTextViewSize"
         tools:text="Sample genre" />
 
 </androidx.cardview.widget.CardView>

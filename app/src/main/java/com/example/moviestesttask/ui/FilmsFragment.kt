@@ -16,17 +16,15 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.moviestesttask.R
-import com.example.moviestesttask.data.util.Resource
 import com.example.moviestesttask.databinding.FragmentFilmsBinding
 import com.example.moviestesttask.domain.entity.FilmListItem
 import com.example.moviestesttask.presentation.MoviesViewModel
 import com.example.moviestesttask.presentation.util.FilmEvent
+import com.example.moviestesttask.presentation.util.GenreEvent
 import com.example.moviestesttask.ui.adapter.FilmAdapter
 import com.example.moviestesttask.ui.adapter.GenreAdapter
 import com.example.moviestesttask.ui.adapter.util.ViewTypes.FILM_HEADER_VIEW_TYPE
 import com.example.moviestesttask.ui.adapter.util.ViewTypes.FILM_VIEW_TYPE
-import com.example.moviestesttask.ui.adapter.util.ViewTypes.GENRE_HEADER_VIEW_TYPE
-import com.example.moviestesttask.ui.adapter.util.ViewTypes.GENRE_VIEW_TYPE
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -78,7 +76,10 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val concatenated = ConcatAdapter(genreAdapter, filmAdapter)
+        val concatAdapterConfig = ConcatAdapter.Config.Builder()
+            .setIsolateViewTypes(false)
+            .build()
+        val concatenated = ConcatAdapter(concatAdapterConfig,genreAdapter, filmAdapter)
 
         val mLayoutManager = getFooterAdjustedGridLayoutManager(concatenated, requireContext())
 
@@ -88,27 +89,6 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
             adapter = concatenated
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                moviesViewModel.filteredMovies.collectLatest { resource ->
-                    when (resource) {
-                        is Resource.Error -> TODO()
-                        is Resource.Loading -> {
-                            binding.recyclerView.isVisible = false
-                            binding.progressBar.isVisible = true
-                        }
-                        is Resource.Success -> {
-                            binding.recyclerView.isVisible = true
-                            binding.progressBar.isVisible = false
-                            resource.data?.let {
-                                filmAdapter.films = it
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -136,6 +116,31 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
                         }
                     }
                 }
+                launch {
+                    moviesViewModel.genres.collectLatest { event ->
+                        when (event) {
+                            is GenreEvent.Error -> {
+                                binding.recyclerView.isVisible = false
+                                binding.progressBar.isVisible = false
+                                Snackbar.make(
+                                    binding.root,
+                                    event.errorMessage,
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                            }
+                            GenreEvent.Loading -> {
+                                binding.recyclerView.isVisible = false
+                                binding.progressBar.isVisible = true
+                            }
+                            is GenreEvent.Success -> {
+                                binding.recyclerView.isVisible = true
+                                binding.progressBar.isVisible = false
+                                genreAdapter.genres = event.genres
+                            }
+                            else -> {}
+                        }
+                    }
+                }
             }
         }
     }
@@ -157,8 +162,6 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
                 return when (concatAdapter.getItemViewType(position)) {
                     FILM_HEADER_VIEW_TYPE -> 2
                     FILM_VIEW_TYPE -> 1
-                    GENRE_HEADER_VIEW_TYPE -> 2
-                    GENRE_VIEW_TYPE -> 2
                     else -> 2
                 }
             }

@@ -6,5 +6,5 @@ import javax.inject.Inject
 class FilterMoviesUseCase @Inject constructor(private val filmsRepository: FilmsRepository) {
 
 
-    operator fun invoke(genre: String) = filmsRepository.getMoviesByGenre(genre)
+    operator fun invoke(genre: String) = filmsRepository.getMovies(genre)
 }

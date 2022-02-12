@@ -2,9 +2,10 @@
 <resources>
     <dimen name="guideline_size">16dp</dimen>
     <dimen name="textViewSize">15sp</dimen>
+    <dimen name="genreTextViewSize">25sp</dimen>
     <dimen name="item_film_image_size">150dp</dimen>
     <dimen name="film_detailed_image_height">150dp</dimen>
     <dimen name="film_detailed_image_width">100dp</dimen>
-    <dimen name="gradient_height">30dp</dimen>
+    <dimen name="gradient_height">50dp</dimen>
     <dimen name="gradient_width">150dp</dimen>
 </resources>

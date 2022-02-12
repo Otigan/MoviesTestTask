@@ -14,5 +14,8 @@
         <!-- Customize your theme here. -->
         <item name="textViewColor">@color/black</item>
         <item name="textViewFilmCardColor">@color/white</item>
+
+        <item name="selectedGenreColor">@color/teal_200</item>
+        <item name="unselectedGenreColor">@color/white</item>
     </style>
 </resources>

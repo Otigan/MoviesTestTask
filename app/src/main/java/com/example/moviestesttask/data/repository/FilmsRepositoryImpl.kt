@@ -38,33 +38,18 @@ class FilmsRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getMovies(): Flow<Resource<List<FilmListItem>>> = flow {
+    override fun getMovies(genre: String?): Flow<Resource<List<FilmListItem>>> = flow {
         try {
             emit(Resource.Loading())
             val response = filmsDataSource.getMovies()
-            val films = response.films.sortedBy { it.localized_name }
-            val mapper = FilmMapper()
-            val filmItems = films.map {
-                mapper.toEntity(it)
-            }
-            val listItems =
-                mutableListOf<FilmListItem>(FilmListItem.Header("Фильмы"))
-            listItems.addAll(filmItems)
-            emit(responseHandler.handleSuccess(listItems.toList()))
-        } catch (e: Exception) {
-            emit(responseHandler.handleException(e, null))
-        }
-    }
-
-    override fun getMoviesByGenre(genre: String): Flow<Resource<List<FilmListItem>>> = flow {
-        try {
-            emit(Resource.Loading())
-            val response = filmsDataSource.getMovies()
-            val films = if (genre.isEmpty()) {
-                response.films.sortedBy { it.localized_name }
-            } else {
-                response.films.filter {
-                    it.genres.contains(genre)
+            val films = when {
+                genre?.isBlank() == true -> {
+                    response.films.sortedBy { it.localized_name }
+                }
+                else -> {
+                    response.films.filter {
+                        it.genres.contains(genre)
+                    }
                 }
             }
             val mapper = FilmMapper()
@@ -79,6 +64,5 @@ class FilmsRepositoryImpl @Inject constructor(
             emit(responseHandler.handleException(e, null))
         }
     }
-
 
 }
