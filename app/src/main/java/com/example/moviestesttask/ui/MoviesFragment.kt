@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,9 +22,10 @@ import com.example.moviestesttask.presentation.MovieEvent
 import com.example.moviestesttask.presentation.MoviesViewModel
 import com.example.moviestesttask.ui.adapter.GenreAdapter
 import com.example.moviestesttask.ui.adapter.MoviesAdapter
+import com.example.moviestesttask.ui.adapter.ViewTypes.FILM_HEADER_VIEW_TYPE
 import com.example.moviestesttask.ui.adapter.ViewTypes.FILM_VIEW_TYPE
+import com.example.moviestesttask.ui.adapter.ViewTypes.GENRE_HEADER_VIEW_TYPE
 import com.example.moviestesttask.ui.adapter.ViewTypes.GENRE_VIEW_TYPE
-import com.example.moviestesttask.ui.adapter.ViewTypes.HEADER_VIEW_TYPE
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,6 +41,7 @@ class MoviesFragment : Fragment(R.layout.fragment_movies) {
     private val binding get() = _binding!!
     private val moviesViewModel by viewModels<MoviesViewModel>()
     private lateinit var moviesAdapter: MoviesAdapter
+    private lateinit var genreAdapter: GenreAdapter
 
 
     override fun onCreateView(
@@ -54,10 +57,14 @@ class MoviesFragment : Fragment(R.layout.fragment_movies) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        moviesAdapter = MoviesAdapter()
-        val genreAdapter = GenreAdapter(onClick = {
-            moviesViewModel.filterMovies(it.title)
+        moviesAdapter = MoviesAdapter(onClick = {
+            navigateToDetailScreen(it)
         })
+        genreAdapter = GenreAdapter(
+            onClick = { genre ->
+                moviesViewModel.filterMovies(genre.title)
+            }
+        )
         val concatenated = ConcatAdapter(genreAdapter, moviesAdapter)
 
         val mLayoutManager = GridLayoutManager(context, 2)
@@ -65,7 +72,8 @@ class MoviesFragment : Fragment(R.layout.fragment_movies) {
         mLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return when (concatenated.getItemViewType(position)) {
-                    HEADER_VIEW_TYPE -> 2
+                    FILM_HEADER_VIEW_TYPE -> 2
+                    GENRE_HEADER_VIEW_TYPE -> 2
                     FILM_VIEW_TYPE -> 1
                     GENRE_VIEW_TYPE -> 2
                     else -> 1
@@ -135,6 +143,11 @@ class MoviesFragment : Fragment(R.layout.fragment_movies) {
                 }
             }
         }
+    }
+
+    private fun navigateToDetailScreen(film: MovieListItem.Film) {
+        val action = MoviesFragmentDirections.actionMoviesFragmentToFilmDetailedFragment(film)
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {

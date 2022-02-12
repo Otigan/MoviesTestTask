@@ -6,10 +6,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.moviestesttask.databinding.ItemHeaderBinding
 import com.example.moviestesttask.databinding.ItemMovieBinding
 import com.example.moviestesttask.domain.entity.MovieListItem
+import com.example.moviestesttask.ui.adapter.ViewTypes.FILM_HEADER_VIEW_TYPE
 import com.example.moviestesttask.ui.adapter.ViewTypes.FILM_VIEW_TYPE
-import com.example.moviestesttask.ui.adapter.ViewTypes.HEADER_VIEW_TYPE
 
-class MoviesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MoviesAdapter(private val onClick: (film: MovieListItem.Film) -> Unit) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var films: List<MovieListItem> = emptyList()
         set(value) {
@@ -19,7 +20,7 @@ class MoviesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int =
         if (films[position] is MovieListItem.Header) {
-            HEADER_VIEW_TYPE
+            FILM_HEADER_VIEW_TYPE
         } else {
             FILM_VIEW_TYPE
         }
@@ -27,7 +28,7 @@ class MoviesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (viewType) {
-            HEADER_VIEW_TYPE -> {
+            FILM_HEADER_VIEW_TYPE -> {
                 val binding =
                     ItemHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 HeaderViewHolder(binding)
@@ -35,7 +36,7 @@ class MoviesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             FILM_VIEW_TYPE -> {
                 val binding =
                     ItemMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                MovieViewHolder(binding)
+                MovieViewHolder(binding, onClick)
             }
             else -> throw IllegalArgumentException("Unknown view type: $viewType")
         }

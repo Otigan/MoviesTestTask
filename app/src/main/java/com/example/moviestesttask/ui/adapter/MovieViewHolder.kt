@@ -7,10 +7,14 @@ import com.example.moviestesttask.domain.entity.MovieListItem
 
 class MovieViewHolder(
     private val binding: ItemMovieBinding,
+    private val onClick: (film: MovieListItem.Film) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(movie: MovieListItem.Film) {
         binding.apply {
+            root.setOnClickListener {
+                onClick(movie)
+            }
             Glide.with(root.context)
                 .load(movie.image_url)
                 .into(cardImage)
